@@ -13,6 +13,7 @@ class AppTextField extends StatelessWidget {
     this.onTap,
     this.validator,
     this.suffixIcon,
+    this.style,
   });
   final TextEditingController controller;
   final String prefixIcon;
@@ -21,6 +22,7 @@ class AppTextField extends StatelessWidget {
   final bool readOnly;
   final VoidCallback? onTap;
   final String? Function(String? value0)? validator;
+  final TextStyle? style;
 
   static final border = OutlineInputBorder(
       borderRadius: BorderRadius.circular(8),
@@ -36,8 +38,10 @@ class AppTextField extends StatelessWidget {
         controller: controller,
         readOnly: readOnly,
         validator: validator,
+        style: style,
         onTap: onTap,
         decoration: InputDecoration(
+          isDense: true,
           hintText: hintText,
           prefixIcon: Transform.scale(
             scale: 0.4,

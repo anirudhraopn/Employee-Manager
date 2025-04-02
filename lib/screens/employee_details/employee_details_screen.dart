@@ -1,18 +1,14 @@
-import 'dart:math';
-
-import 'package:date_picker_plus/date_picker_plus.dart';
 import 'package:employee_manager/constants/app_colors.dart';
 import 'package:employee_manager/constants/app_constants.dart';
-import 'package:employee_manager/main.dart';
+import 'package:employee_manager/constants/app_text_styles.dart';
 import 'package:employee_manager/models/employee.dart';
 import 'package:employee_manager/screens/home/bloc/home_bloc.dart';
 import 'package:employee_manager/screens/home/bloc/home_events.dart';
 import 'package:employee_manager/utils/app_date_utils.dart';
 import 'package:employee_manager/utils/app_icons.dart';
 import 'package:employee_manager/utils/validators.dart';
-import 'package:employee_manager/widgets/app_button.dart';
 import 'package:employee_manager/widgets/app_text_field.dart';
-import 'package:employee_manager/widgets/my_date_picker.dart';
+import 'package:employee_manager/widgets/my_date_picker_dialog.dart';
 import 'package:employee_manager/widgets/save_cancel_row.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -38,8 +34,55 @@ class _EmployeeDetailsScreenState extends State<EmployeeDetailsScreen> {
   final TextEditingController endDateController =
       TextEditingController(text: 'No date');
   bool isEditing = false;
-  DateTime? startDate = DateTime.now(), endDate;
+  DateTime startDate = DateTime.now();
+  DateTime? endDate;
   String? selectedRole;
+
+  final startDateQuickOptions = [
+    QuickButton(
+      text: 'Today',
+      onTap: (currentDateNotifier) {
+        final date = DateTime.now();
+        currentDateNotifier.value = date;
+      },
+    ),
+    QuickButton(
+      text: 'Next Monday',
+      onTap: (currentDateNotifier) {
+        final date = AppDateUtils.getDateForDay(1, DateTime.now());
+        currentDateNotifier.value = date;
+      },
+    ),
+    QuickButton(
+      text: 'Next Tuesday',
+      onTap: (currentDateNotifier) {
+        final date = AppDateUtils.getDateForDay(2, DateTime.now());
+        currentDateNotifier.value = date;
+      },
+    ),
+    QuickButton(
+      text: 'After 1 week',
+      onTap: (currentDateNotifier) {
+        final nextWeek = DateTime.now().add(const Duration(days: 7));
+        currentDateNotifier.value = nextWeek;
+      },
+    ),
+  ];
+
+  final endDateQuickOptions = [
+    QuickButton(
+      text: 'No date',
+      onTap: (currentDate) {
+        currentDate.value = null;
+      },
+    ),
+    QuickButton(
+      text: 'Today',
+      onTap: (currentDate) {
+        currentDate.value = DateTime.now();
+      },
+    ),
+  ];
   @override
   void initState() {
     super.initState();
@@ -80,11 +123,11 @@ class _EmployeeDetailsScreenState extends State<EmployeeDetailsScreen> {
                         .add(DeleteEmployee(widget.employee!.key));
                     Navigator.pop(context);
                   },
-                  icon: Icon(
+                  icon: const Icon(
                     CupertinoIcons.trash,
                   ),
                 )
-              : SizedBox(),
+              : const SizedBox(),
         ],
       ),
       body: Padding(
@@ -116,7 +159,7 @@ class _EmployeeDetailsScreenState extends State<EmployeeDetailsScreen> {
                             context: context,
                             builder: (context) {
                               return Padding(
-                                padding: EdgeInsets.only(bottom: 12),
+                                padding: const EdgeInsets.only(bottom: 12),
                                 child: ListView.separated(
                                   separatorBuilder: (context, index) => Divider(
                                     color: AppColors.textGrey
@@ -155,58 +198,29 @@ class _EmployeeDetailsScreenState extends State<EmployeeDetailsScreen> {
                               readOnly: true,
                               controller: startDateController,
                               hintText: 'Start Date',
+                              style: AppTextStyles.bodySmall,
                               prefixIcon: AppIcons.calendar,
                               onTap: () async {
+                                final now = DateTime.now();
                                 startDate = await showCustomDatePicker(
-                                    context: context,
-                                    firstDate: DateTime(1950),
-                                    lastDate: DateTime(2050),
-                                    initialDate: DateTime.now(),
-                                    quickButtonList: [
-                                      QuickButton(
-                                        text: 'Today',
-                                        onTap: (currentDateNotifier) {
-                                          final date = DateTime.now();
-                                          currentDateNotifier.value = date;
-                                        },
-                                      ),
-                                      QuickButton(
-                                        text: 'Next Monday',
-                                        onTap: (currentDateNotifier) {
-                                          final date =
-                                              AppDateUtils.getDateForDay(
-                                                  1, DateTime.now());
-                                          currentDateNotifier.value = date;
-                                        },
-                                      ),
-                                      QuickButton(
-                                        text: 'Next Tuesday',
-                                        onTap: (currentDateNotifier) {
-                                          final date =
-                                              AppDateUtils.getDateForDay(
-                                                  2, DateTime.now());
-                                          currentDateNotifier.value = date;
-                                        },
-                                      ),
-                                      QuickButton(
-                                        text: 'After 1 week',
-                                        onTap: (currentDateNotifier) {
-                                          final nextWeek = DateTime.now()
-                                              .add(Duration(days: 7));
-                                          currentDateNotifier.value = nextWeek;
-                                        },
-                                      ),
-                                    ]);
-                                if (startDate != null) {
-                                  startDateController.text =
-                                      AppDateUtils.getFormatedDateForList(
-                                          startDate!);
-                                }
+                                        context: context,
+                                        firstDate: DateTime(
+                                            now.year - 50, now.month, now.day),
+                                        lastDate: DateTime(
+                                            now.year, now.month + 2, now.day),
+                                        initialDate:
+                                            widget.employee?.startDate ?? now,
+                                        quickButtonList:
+                                            startDateQuickOptions) ??
+                                    now;
+                                startDateController.text =
+                                    AppDateUtils.getFormatedDateForList(
+                                        startDate);
                               },
                             ),
                           ),
                           Container(
-                              width: 50,
+                              width: 30,
                               alignment: Alignment.center,
                               child: SvgPicture.asset(AppIcons.arrow)),
                           Expanded(
@@ -215,26 +229,17 @@ class _EmployeeDetailsScreenState extends State<EmployeeDetailsScreen> {
                               controller: endDateController,
                               hintText: 'End date',
                               prefixIcon: AppIcons.calendar,
+                              style: AppTextStyles.bodySmall,
                               onTap: () async {
+                                final now = DateTime.now();
                                 endDate = await showCustomDatePicker(
-                                    context: context,
-                                    firstDate: DateTime(1950),
-                                    lastDate: DateTime(2050),
-                                    initialDate: DateTime.now(),
-                                    quickButtonList: [
-                                      QuickButton(
-                                        text: 'No date',
-                                        onTap: (currentDate) {
-                                          currentDate.value = null;
-                                        },
-                                      ),
-                                      QuickButton(
-                                        text: 'Today',
-                                        onTap: (currentDate) {
-                                          currentDate.value = DateTime.now();
-                                        },
-                                      ),
-                                    ]);
+                                  context: context,
+                                  firstDate: DateTime(
+                                      now.year - 50, now.month, now.day),
+                                  lastDate: DateTime(now.year + 1),
+                                  initialDate: widget.employee?.endDate ?? now,
+                                  quickButtonList: endDateQuickOptions,
+                                );
                                 if (endDate != null) {
                                   endDateController.text =
                                       AppDateUtils.getFormatedDateForList(
@@ -257,27 +262,29 @@ class _EmployeeDetailsScreenState extends State<EmployeeDetailsScreen> {
                 onCancel: () {
                   Navigator.pop(context);
                 },
-                onSave: () {
-                  if (formKey.currentState?.validate() != true) {
-                    return;
-                  }
-                  final employee = Employee(
-                    name: nameController.text,
-                    role: selectedRoleController.text,
-                    startDate: startDate!,
-                    endDate: endDate,
-                  );
-                  context.read<HomeBloc>().add(isEditing
-                      ? EditEmployee(widget.employee!.key, employee: employee)
-                      : AddEmployee(employee: employee));
-                  Navigator.pop(context);
-                },
+                onSave: onSave,
               ),
             )
           ],
         ),
       ),
     );
+  }
+
+  onSave() {
+    if (formKey.currentState?.validate() != true) {
+      return;
+    }
+    final employee = Employee(
+      name: nameController.text,
+      role: selectedRoleController.text,
+      startDate: startDate!,
+      endDate: endDate,
+    );
+    context.read<HomeBloc>().add(isEditing
+        ? EditEmployee(widget.employee!.key, employee: employee)
+        : AddEmployee(employee: employee));
+    Navigator.pop(context);
   }
 }
 

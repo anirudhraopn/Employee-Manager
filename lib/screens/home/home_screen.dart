@@ -9,7 +9,6 @@ import 'package:employee_manager/utils/app_images.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
@@ -55,12 +54,18 @@ class _HomeScreenState extends State<HomeScreen> {
 
           pastEmployees = employeeList
               .where(
-                (element) => element.endDate != null,
+                (element) =>
+                    element.endDate != null &&
+                    element.endDate!.isBefore(DateTime.now()),
               )
               .toList();
           currentEmployees = employeeList
               .where(
-                (element) => element.endDate == null,
+                (element) =>
+                    element.endDate == null ||
+                    element.endDate!.isAfter(
+                      DateTime.now(),
+                    ),
               )
               .toList();
 

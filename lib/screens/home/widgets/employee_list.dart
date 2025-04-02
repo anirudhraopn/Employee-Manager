@@ -1,4 +1,5 @@
 import 'package:employee_manager/constants/app_colors.dart';
+import 'package:employee_manager/constants/app_text_styles.dart';
 import 'package:employee_manager/models/employee.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -23,10 +24,8 @@ class EmployeeList extends StatelessWidget {
           alignment: Alignment.centerLeft,
           child: Text(
             title,
-            style: const TextStyle(
+            style: AppTextStyles.headingStyle.copyWith(
               color: AppColors.primaryColor,
-              fontWeight: FontWeight.w500,
-              fontSize: 16,
             ),
           ),
         ),

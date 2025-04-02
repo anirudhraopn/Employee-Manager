@@ -1,17 +1,15 @@
 import 'dart:math';
 
 import 'package:calendar_date_picker2/calendar_date_picker2.dart';
-import 'package:calendar_date_picker2/calendar_date_picker2.dart' as c;
-import 'package:date_picker_plus/date_picker_plus.dart';
 import 'package:employee_manager/constants/app_colors.dart';
 import 'package:employee_manager/constants/app_constants.dart';
-import 'package:employee_manager/screens/employee_details/employee_details_screen.dart';
 import 'package:employee_manager/utils/app_date_utils.dart';
 import 'package:employee_manager/utils/app_icons.dart';
 import 'package:employee_manager/widgets/app_button.dart';
 import 'package:employee_manager/widgets/save_cancel_row.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:intl/intl.dart';
 
 class MyDatePicker extends StatefulWidget {
   const MyDatePicker({
@@ -35,10 +33,24 @@ class _MyDatePickerState extends State<MyDatePicker> {
 
   final ValueNotifier<int> selectedQuickButton = ValueNotifier(-1);
 
+  late final PageController controller;
+
+  late final ValueNotifier<DateTime> currentPageNotifier;
+
   @override
   void initState() {
     super.initState();
+    final months =
+        (widget.lastDate.difference(widget.firstDate).inDays) * 12 ~/ 365;
+    final currentDifference = (widget.lastDate
+            .difference(widget.initialDate ?? DateTime.now())
+            .inDays) *
+        12 /
+        365;
+    final initialPage = months.round() - currentDifference.round();
+    controller = PageController(initialPage: initialPage);
     currentDateNotifier = ValueNotifier(widget.initialDate);
+    currentPageNotifier = ValueNotifier(widget.initialDate ?? DateTime.now());
   }
 
   @override
@@ -49,7 +61,7 @@ class _MyDatePickerState extends State<MyDatePicker> {
       insetPadding: EdgeInsets.symmetric(horizontal: min(20, size.width * 0.1)),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
       child: Padding(
-        padding: const EdgeInsets.all(8.0),
+        padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 12),
         child: ValueListenableBuilder<DateTime?>(
           valueListenable: currentDateNotifier,
           builder: (context, currentDate, child) => Column(
@@ -73,13 +85,61 @@ class _MyDatePickerState extends State<MyDatePicker> {
                         onTap: () {
                           item.onTap(currentDateNotifier);
                           selectedQuickButton.value = index;
+                          if (currentDateNotifier.value != null) {
+                            currentPageNotifier.value =
+                                currentDateNotifier.value!;
+                          }
                         },
                       ),
                     );
                   },
                 ),
               ),
-              calPic2(currentDate),
+              ValueListenableBuilder<DateTime>(
+                valueListenable: currentPageNotifier,
+                builder: (context, currentPage, child) {
+                  bool disablePrevious =
+                      currentPage.month == widget.firstDate.month &&
+                          currentPage.year == widget.firstDate.year;
+                  bool disableNext =
+                      currentPage.month == widget.lastDate.month &&
+                          currentPage.year == widget.lastDate.year;
+                  return Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      spacing: 16,
+                      children: [
+                        const Spacer(),
+                        GestureDetector(
+                            onTap: disablePrevious ? null : previousPage,
+                            child: const Icon(Icons.arrow_left)),
+                        Expanded(
+                          flex: 5,
+                          child: Text(
+                            DateFormat('MMMM yyyy').format(currentPage),
+                            textAlign: TextAlign.center,
+                            style: const TextStyle(
+                                fontWeight: FontWeight.w500, fontSize: 16),
+                          ),
+                        ),
+                        IconButton(
+                          onPressed: disableNext ? null : nextPage,
+                          icon: Icon(Icons.arrow_right),
+                        ),
+                        const Spacer(),
+                      ],
+                    ),
+                  );
+                },
+              ),
+              const SizedBox(
+                height: 8,
+              ),
+              SizedBox(
+                height: 250,
+                child: myDatePicker(),
+              ),
               Row(
                 children: [
                   Expanded(
@@ -101,12 +161,8 @@ class _MyDatePickerState extends State<MyDatePicker> {
                     ),
                   ),
                   SaveCancelRow(
-                    onSave: () {
-                      Navigator.pop(context, currentDate);
-                    },
-                    onCancel: () {
-                      Navigator.pop(context);
-                    },
+                    onSave: () => Navigator.pop(context, currentDate),
+                    onCancel: () => Navigator.pop(context),
                   )
                 ],
               ),
@@ -117,15 +173,30 @@ class _MyDatePickerState extends State<MyDatePicker> {
     );
   }
 
-  CalendarDatePicker2 calPic2(DateTime? currentDate) {
+  void nextPage() async {
+    if(!mounted) return;
+    await controller.nextPage(duration: Durations.medium1, curve: Curves.ease);
+  }
+
+  void previousPage() async {
+     if(!mounted) return;
+    await controller.previousPage(
+        duration: Durations.medium1, curve: Curves.ease);
+  }
+
+  CalendarDatePicker2 myDatePicker() {
     return CalendarDatePicker2(
       value: [
-        currentDate,
+        currentDateNotifier.value,
       ],
-      displayedMonthDate: DateTime.now(),
+      onDisplayedMonthChanged: (value) {
+        currentPageNotifier.value = value;
+      },
+      displayedMonthDate: currentPageNotifier.value,
       onValueChanged: (value) {
         selectedQuickButton.value = -1;
         currentDateNotifier.value = value.first;
+        // currentPageNotifier.value = value.first;
       },
       config: CalendarDatePicker2Config(
         calendarType: CalendarDatePicker2Type.single,
@@ -135,13 +206,29 @@ class _MyDatePickerState extends State<MyDatePicker> {
         },
         selectedDayHighlightColor: AppColors.primaryColor,
         daySplashColor: Colors.transparent,
-        customModePickerIcon: SizedBox(),
+        customModePickerIcon: const SizedBox(),
+        dayViewController: controller,
+        dayModeScrollDirection: Axis.horizontal,
+        hideScrollViewTopHeader: true,
+        hideScrollViewMonthWeekHeader: true,
+        animateToDisplayedMonthDate: false,
+        centerAlignModePicker: true,
+        disableMonthPicker: true,
+        controlsHeight: 0,
+        hideLastMonthIcon: true,
+        hideNextMonthIcon: true,
+        firstDate: widget.firstDate,
+        lastDate: widget.lastDate,
       ),
     );
   }
 
-  void onDateChanged(DateTime value) {
-    currentDateNotifier.value = value;
+  @override
+  void dispose() {
+    currentDateNotifier.dispose();
+    currentPageNotifier.dispose();
+    selectedQuickButton.dispose();
+    super.dispose();
   }
 }
 

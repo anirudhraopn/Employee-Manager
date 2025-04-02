@@ -1,4 +1,5 @@
 import 'package:employee_manager/constants/app_colors.dart';
+import 'package:employee_manager/constants/app_text_styles.dart';
 import 'package:employee_manager/models/employee.dart';
 import 'package:employee_manager/screens/employee_details/employee_details_screen.dart';
 import 'package:employee_manager/screens/home/bloc/home_bloc.dart';
@@ -52,10 +53,7 @@ class ListItem extends StatelessWidget {
             children: [
               Text(
                 employee.name,
-                style: const TextStyle(
-                  fontWeight: FontWeight.w500,
-                  fontSize: 16,
-                ),
+                style:  AppTextStyles.headingStyle,
               ),
               Text(
                 employee.role.isEmpty ? '' : employee.role,
