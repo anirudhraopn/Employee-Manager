@@ -16,3 +16,11 @@ class EditEmployee extends HomeEvents {
 
   EditEmployee(this.key, {required this.employee});
 }
+
+class DeleteEmployee extends HomeEvents {
+  final dynamic key;
+
+  DeleteEmployee(
+    this.key,
+  );
+}

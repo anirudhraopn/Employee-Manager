@@ -15,48 +15,58 @@ class HomeBloc extends Bloc<HomeEvents, HomeState> {
     emit(LoadingData());
     switch (event) {
       case FetchEmployees():
-        fetchEmployees(emit);
+        _fetchEmployees(emit);
         break;
       case AddEmployee():
-        await addEmployee(event, emit);
+        await _addEmployee(event, emit);
         break;
       case EditEmployee():
-       await editEmployee(event, emit);
+        await _editEmployee(event, emit);
+        break;
+      case DeleteEmployee():
+        await _deleteEmployee(event, emit);
         break;
       default:
         emit(EmployeesListFailure());
     }
   }
 
-  void fetchEmployees(Emitter<HomeState> emit) {
+  void _fetchEmployees(Emitter<HomeState> emit) {
     try {
-      final list = getEmployees();
+      final list = _getEmployees();
       if (list.isEmpty) {
         emit(EmployeesListEmpty());
       } else {
         emit(EmployeesListSuccess(employeeList: list));
       }
     } catch (e, s) {
-      AppErrorHandler.onError(e, s, 'fetchEmployees');
+      AppErrorHandler.onError(e, s, '_fetchEmployees');
     }
   }
 
-  Future<void> addEmployee(AddEmployee event, Emitter<HomeState> emit) async {
+  Future<void> _addEmployee(AddEmployee event, Emitter<HomeState> emit) async {
     await HiveHelper.addEmployee(event.employee);
-    emit(EmployeesListSuccess(employeeList: getEmployees()));
+    _fetchEmployees(emit);
   }
 
-  Future<void> editEmployee(EditEmployee event, Emitter<HomeState> emit) async {
+  Future<void> _editEmployee(
+      EditEmployee event, Emitter<HomeState> emit) async {
     try {
       await HiveHelper.updateEmployee(event.key, event.employee);
-      emit(EmployeesListSuccess(employeeList: getEmployees()));
+      _fetchEmployees(emit);
     } catch (e, s) {
-      AppErrorHandler.onError(e, s, 'editEmployee');
+      AppErrorHandler.onError(e, s, '_editEmployee');
     }
   }
 
-  List<Employee> getEmployees() {
+  List<Employee> _getEmployees() {
     final list = HiveHelper.employeeBox.values.toList();
     return list;
+  }
+
+  Future<void> _deleteEmployee(
+      DeleteEmployee event, Emitter<HomeState> emit) async {
+    await HiveHelper.deleteEmployee(event.key);
+    _fetchEmployees(emit);
   }
 }

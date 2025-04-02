@@ -29,7 +29,20 @@ class HiveHelper {
     if (index == -1) {
       return;
     }
-    await employeeBox.deleteAt(index);
-    await employeeBox.putAt(max(index - 1, 0), employee);
+    // await employeeBox.deleteAt(index);
+    await employeeBox.putAt(max(index, 0), employee);
+  }
+
+static Future<void> deleteEmployee(dynamic key) async {
+    final index = employeeBox.values.toList().indexWhere(
+      (element) {
+        return key == element.key;
+      },
+    );
+    if (index == -1) {
+      return;
+    }
+    // await employeeBox.deleteAt(index);
+    await employeeBox.deleteAt(max(index, 0));
   }
 }
