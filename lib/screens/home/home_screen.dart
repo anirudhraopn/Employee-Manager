@@ -1,3 +1,4 @@
+import 'package:employee_manager/constants/app_colors.dart';
 import 'package:employee_manager/models/employee.dart';
 import 'package:employee_manager/screens/employee_details/employee_details_screen.dart';
 import 'package:employee_manager/screens/home/bloc/home_bloc.dart';
@@ -5,12 +6,9 @@ import 'package:employee_manager/screens/home/bloc/home_events.dart';
 import 'package:employee_manager/screens/home/bloc/home_state.dart';
 import 'package:employee_manager/screens/home/widgets/employee_list.dart';
 import 'package:employee_manager/utils/app_images.dart';
-import 'package:employee_manager/utils/app_date_utils.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import 'widgets/list_item.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -83,6 +81,15 @@ class _HomeScreenState extends State<HomeScreen> {
                         employeeList: pastEmployees,
                       ),
                     ),
+              Container(
+                color: AppColors.bgColor,
+                alignment: Alignment.centerLeft,
+                padding: const EdgeInsets.fromLTRB(16, 24, 16, 16),
+                child: const Text(
+                  'Swipe left to delete',
+                  style: TextStyle(color: AppColors.textGrey),
+                ),
+              )
             ],
           );
         },

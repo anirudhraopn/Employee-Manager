@@ -54,7 +54,7 @@ class AppTextField extends StatelessWidget {
               : Transform.translate(
                   offset: Offset(12, 0),
                   child: Transform.scale(
-                    scale: 0.2,
+                    scale: 0.18,
                     child: FittedBox(
                       child: SvgPicture.asset(
                         suffixIcon!,
