@@ -14,34 +14,35 @@ class ListItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Dismissible(
-      key: Key(employee.key.toString()),
-      direction: DismissDirection.endToStart,
-      background: Container(
-        color: Colors.red,
-        padding: const EdgeInsets.symmetric(horizontal: 20),
-        child: const Row(
-          mainAxisAlignment: MainAxisAlignment.end,
-          children: [
-            Icon(
-              CupertinoIcons.delete,
-              color: Colors.white,
-            ),
-          ],
-        ),
-      ),
-      onDismissed: (direction) {
-        context.read<HomeBloc>().add(DeleteEmployee(employee.key));
-      },
-      child: InkWell(
+    return InkWell(
         onTap: () {
           Navigator.push(
               context,
               MaterialPageRoute(
+                fullscreenDialog: true,
                 builder: (context) => EmployeeDetailsScreen(
                   employee: employee,
                 ),
               ));
+        },
+      child: Dismissible(
+        key: Key(employee.key.toString()),
+        direction: DismissDirection.endToStart,
+        background: Container(
+          color: Colors.red,
+          padding: const EdgeInsets.symmetric(horizontal: 20),
+          child: const Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              Icon(
+                CupertinoIcons.delete,
+                color: Colors.white,
+              ),
+            ],
+          ),
+        ),
+        onDismissed: (direction) {
+          context.read<HomeBloc>().add(DeleteEmployee(employee.key));
         },
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),

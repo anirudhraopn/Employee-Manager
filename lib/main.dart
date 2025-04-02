@@ -27,6 +27,7 @@ class MyApp extends StatelessWidget {
       create: (_) => HomeBloc(EmployeesListEmpty()),
       child: MaterialApp(
         title: 'Employee Manager',
+        debugShowCheckedModeBanner: false,
         theme: ThemeData(
           colorScheme: ColorScheme.fromSeed(
             seedColor: AppColors.primaryColor,

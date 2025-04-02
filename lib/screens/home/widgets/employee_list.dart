@@ -34,7 +34,7 @@ class EmployeeList extends StatelessWidget {
           child: ListView.separated(
             itemCount: employeeList.length,
             separatorBuilder: (context, index) {
-              return Divider();
+              return const Divider();
             },
             itemBuilder: (context, index) {
               final employee = employeeList[index];

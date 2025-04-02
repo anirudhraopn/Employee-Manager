@@ -9,6 +9,7 @@ import 'package:employee_manager/screens/home/bloc/home_bloc.dart';
 import 'package:employee_manager/screens/home/bloc/home_events.dart';
 import 'package:employee_manager/utils/app_date_utils.dart';
 import 'package:employee_manager/utils/app_icons.dart';
+import 'package:employee_manager/utils/validators.dart';
 import 'package:employee_manager/widgets/app_button.dart';
 import 'package:employee_manager/widgets/app_text_field.dart';
 import 'package:employee_manager/widgets/my_date_picker.dart';
@@ -100,29 +101,41 @@ class _EmployeeDetailsScreenState extends State<EmployeeDetailsScreen> {
                         controller: nameController,
                         hintText: 'Employee Name',
                         prefixIcon: AppIcons.person,
+                        validator: Validators.validateName,
                       ),
                       AppTextField(
                         controller: selectedRoleController,
                         prefixIcon: AppIcons.role,
                         hintText: 'Select role',
+                        validator: Validators.validateRole,
+                        readOnly: true,
+                        suffixIcon: AppIcons.dropdown,
                         onTap: () async {
                           FocusManager.instance.primaryFocus?.unfocus();
                           final role = await showModalBottomSheet(
                             context: context,
                             builder: (context) {
-                              return Column(
-                                mainAxisSize: MainAxisSize.min,
-                                children: List.generate(
-                                  AppConstants.roles.length,
-                                  (index) {
+                              return Padding(
+                                padding: EdgeInsets.only(bottom: 12),
+                                child: ListView.separated(
+                                  separatorBuilder: (context, index) => Divider(
+                                    color: AppColors.textGrey
+                                        .withValues(alpha: 0.5),
+                                  ),
+                                  shrinkWrap: true,
+                                  itemCount: AppConstants.roles.length,
+                                  itemBuilder: (context, index) {
                                     final role = AppConstants.roles[index];
-                                    return ListTile(
-                                      onTap: () {
-                                        Navigator.pop(context, role);
-                                      },
-                                      title: Text(
-                                        role,
-                                        textAlign: TextAlign.center,
+                                    return SizedBox(
+                                      height: 40,
+                                      child: ListTile(
+                                        onTap: () {
+                                          Navigator.pop(context, role);
+                                        },
+                                        title: Text(
+                                          role,
+                                          textAlign: TextAlign.center,
+                                        ),
                                       ),
                                     );
                                   },
@@ -245,6 +258,9 @@ class _EmployeeDetailsScreenState extends State<EmployeeDetailsScreen> {
                   Navigator.pop(context);
                 },
                 onSave: () {
+                  if (formKey.currentState?.validate() != true) {
+                    return;
+                  }
                   final employee = Employee(
                     name: nameController.text,
                     role: selectedRoleController.text,
@@ -254,6 +270,7 @@ class _EmployeeDetailsScreenState extends State<EmployeeDetailsScreen> {
                   context.read<HomeBloc>().add(isEditing
                       ? EditEmployee(widget.employee!.key, employee: employee)
                       : AddEmployee(employee: employee));
+                  Navigator.pop(context);
                 },
               ),
             )

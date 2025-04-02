@@ -11,12 +11,16 @@ class AppTextField extends StatelessWidget {
     required this.hintText,
     this.readOnly = false,
     this.onTap,
+    this.validator,
+    this.suffixIcon,
   });
   final TextEditingController controller;
   final String prefixIcon;
+  final String? suffixIcon;
   final String hintText;
   final bool readOnly;
   final VoidCallback? onTap;
+  final String? Function(String? value0)? validator;
 
   static final border = OutlineInputBorder(
       borderRadius: BorderRadius.circular(8),
@@ -31,6 +35,7 @@ class AppTextField extends StatelessWidget {
         autocorrect: false,
         controller: controller,
         readOnly: readOnly,
+        validator: validator,
         onTap: onTap,
         decoration: InputDecoration(
           hintText: hintText,
@@ -44,6 +49,21 @@ class AppTextField extends StatelessWidget {
               ),
             ),
           ),
+          suffixIcon: suffixIcon == null
+              ? null
+              : Transform.translate(
+                  offset: Offset(12, 0),
+                  child: Transform.scale(
+                    scale: 0.2,
+                    child: FittedBox(
+                      child: SvgPicture.asset(
+                        suffixIcon!,
+                        height: 24,
+                        width: 24,
+                      ),
+                    ),
+                  ),
+                ),
         ),
       ),
     );
