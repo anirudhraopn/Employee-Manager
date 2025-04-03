@@ -120,7 +120,7 @@ class _EmployeeDetailsScreenState extends State<EmployeeDetailsScreen> {
                   onPressed: () {
                     context
                         .read<HomeBloc>()
-                        .add(DeleteEmployee(widget.employee!.key));
+                        .add(SoftDeleteEmployee(key: widget.employee!.key));
                     Navigator.pop(context);
                   },
                   icon: const Icon(
@@ -187,7 +187,7 @@ class _EmployeeDetailsScreenState extends State<EmployeeDetailsScreen> {
                             },
                           );
                           selectedRole = role;
-                          selectedRoleController.text = role;
+                          selectedRoleController.text = role ?? '';
                           FocusManager.instance.primaryFocus?.unfocus();
                         },
                       ),

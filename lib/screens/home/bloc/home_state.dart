@@ -13,3 +13,23 @@ class EmployeesListSuccess extends HomeState {
 class EmployeesListEmpty extends HomeState {}
 
 class EmployeesListFailure extends HomeState {}
+
+class SoftDeletedSuccessfully extends HomeState {
+  final Employee employee;
+
+  SoftDeletedSuccessfully(this.employee);
+}
+
+class RestoreSuccessful extends HomeState {
+  final Employee employee;
+
+  RestoreSuccessful(this.employee);
+}
+
+class HardDeletedEmployee extends HomeState {
+  final Employee employee;
+
+  HardDeletedEmployee({required this.employee});
+}
+
+class AutoDeleteSuccessful extends HomeState {}

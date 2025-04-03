@@ -43,7 +43,7 @@ class ListItem extends StatelessWidget {
           ),
         ),
         onDismissed: (direction) {
-          context.read<HomeBloc>().add(DeleteEmployee(employee.key));
+          context.read<HomeBloc>().add(SoftDeleteEmployee(key:employee.key));
         },
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),

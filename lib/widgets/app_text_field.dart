@@ -40,6 +40,7 @@ class AppTextField extends StatelessWidget {
         validator: validator,
         style: style,
         onTap: onTap,
+        mouseCursor:  readOnly ? SystemMouseCursors.click : MouseCursor.defer,
         decoration: InputDecoration(
           isDense: true,
           hintText: hintText,
@@ -56,7 +57,7 @@ class AppTextField extends StatelessWidget {
           suffixIcon: suffixIcon == null
               ? null
               : Transform.translate(
-                  offset: Offset(12, 0),
+                  offset: const Offset(12, 0),
                   child: Transform.scale(
                     scale: 0.18,
                     child: FittedBox(

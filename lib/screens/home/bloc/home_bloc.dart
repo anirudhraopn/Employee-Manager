@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:employee_manager/hive_helper.dart';
 import 'package:employee_manager/screens/home/bloc/home_events.dart';
 import 'package:employee_manager/screens/home/bloc/home_state.dart';
@@ -12,22 +14,35 @@ class HomeBloc extends Bloc<HomeEvents, HomeState> {
   }
 
   void registerHandler(HomeEvents event, Emitter<HomeState> emit) async {
-    emit(LoadingData());
-    switch (event) {
-      case FetchEmployees():
-        _fetchEmployees(emit);
-        break;
-      case AddEmployee():
-        await _addEmployee(event, emit);
-        break;
-      case EditEmployee():
-        await _editEmployee(event, emit);
-        break;
-      case DeleteEmployee():
-        await _deleteEmployee(event, emit);
-        break;
-      default:
-        emit(EmployeesListFailure());
+    log(event.toString());
+    if (event.runtimeType != AutoDeleteDeletedEmployees) {
+      emit(LoadingData());
+    }
+    try {
+      switch (event) {
+        case FetchEmployees():
+          _fetchEmployees(emit);
+          break;
+        case AddEmployee():
+          await _addEmployee(event, emit);
+          break;
+        case EditEmployee():
+          await _editEmployee(event, emit);
+          break;
+        case HardDeleteEmployee():
+          await _deleteEmployee(event, emit);
+          break;
+        case SoftDeleteEmployee():
+          await _softDeleteEmployee(event, emit);
+          break;
+        case UndoDelete():
+          await _restoreEmployee(event, emit);
+        case AutoDeleteDeletedEmployees():
+          await _autoDeleteDeletedEmployees(event, emit);
+      }
+    } catch (e, s) {
+      AppErrorHandler.onError(e, s, 'registerHandler');
+      emit(EmployeesListFailure());
     }
   }
 
@@ -60,13 +75,52 @@ class HomeBloc extends Bloc<HomeEvents, HomeState> {
   }
 
   List<Employee> _getEmployees() {
-    final list = HiveHelper.employeeBox.values.toList();
+    final list = HiveHelper.employeeBox.values
+        .where(
+          (element) => !element.isDeleted,
+        )
+        .toList();
     return list;
   }
 
   Future<void> _deleteEmployee(
-      DeleteEmployee event, Emitter<HomeState> emit) async {
+      HardDeleteEmployee event, Emitter<HomeState> emit) async {
+    final employeeIndex = HiveHelper.getEmployeeIndex(event.key);
+    Employee? employee;
+    if (employeeIndex != null) {
+      employee = HiveHelper.employeeBox.values.toList()[employeeIndex];
+    }
     await HiveHelper.deleteEmployee(event.key);
+    _fetchEmployees(emit);
+    emit(HardDeletedEmployee(employee: employee!));
+  }
+
+  Future<void> _restoreEmployee(
+      UndoDelete event, Emitter<HomeState> emit) async {
+    final employee = HiveHelper.employeeBox.get(event.key);
+    final newEmployee = employee!.copyWith(isDeleted: false);
+    await HiveHelper.updateEmployee(event.key, newEmployee);
+    emit(RestoreSuccessful(newEmployee));
+    _fetchEmployees(emit);
+  }
+
+  Future<void> _softDeleteEmployee(
+      SoftDeleteEmployee event, Emitter<HomeState> emit) async {
+    final employee = HiveHelper.employeeBox.get(event.key);
+    final newEmployee = employee!.copyWith(isDeleted: true);
+    await HiveHelper.updateEmployee(event.key, newEmployee);
+    emit(SoftDeletedSuccessfully(newEmployee));
+    _fetchEmployees(emit);
+  }
+
+  Future<void> _autoDeleteDeletedEmployees(
+      HomeEvents event, Emitter<HomeState> emit) async {
+    final list = HiveHelper.employeeBox.values
+        .where(
+          (element) => element.isDeleted,
+        )
+        .toList();
+    await HiveHelper.deleteEmployees(list);
     _fetchEmployees(emit);
   }
 }

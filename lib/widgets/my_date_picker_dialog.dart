@@ -60,113 +60,180 @@ class _MyDatePickerState extends State<MyDatePicker> {
       backgroundColor: Colors.white,
       insetPadding: EdgeInsets.symmetric(horizontal: min(20, size.width * 0.1)),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 12),
-        child: ValueListenableBuilder<DateTime?>(
-          valueListenable: currentDateNotifier,
-          builder: (context, currentDate, child) => Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              GridView.count(
-                crossAxisCount: 2,
-                childAspectRatio: 4,
-                mainAxisSpacing: 16,
-                crossAxisSpacing: 16,
-                shrinkWrap: true,
-                children: List.generate(
-                  widget.quickButtonList.length,
-                  (index) {
-                    final item = widget.quickButtonList[index];
-                    return ValueListenableBuilder<int>(
-                      valueListenable: selectedQuickButton,
-                      builder: (context, value, child) => AppButton(
-                        text: item.text,
-                        isPrimary: index == value,
-                        onTap: () {
-                          item.onTap(currentDateNotifier);
-                          selectedQuickButton.value = index;
-                          if (currentDateNotifier.value != null) {
-                            currentPageNotifier.value =
-                                currentDateNotifier.value!;
-                          }
-                        },
+      child: SizedBox(
+        width: size.width<400?null:400,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 12),
+          child: ValueListenableBuilder<DateTime?>(
+            valueListenable: currentDateNotifier,
+            builder: (context, currentDate, child) => Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // Wrap(
+                //   alignment: WrapAlignment.spaceBetween,
+                //   direction: Axis.horizontal,
+                //   runSpacing: 16,
+                //   spacing: 16,
+                //   runAlignment: WrapAlignment.spaceBetween,
+                //   children: List.generate(
+                //     widget.quickButtonList.length,
+                //     (index) {
+                //       final item = widget.quickButtonList[index];
+                //       return SizedBox(
+                //         width: 150,
+                //         child: ValueListenableBuilder<int>(
+                //           valueListenable: selectedQuickButton,
+                //           builder: (context, value, child) => AppButton(
+                //             text: item.text,
+                //             isPrimary: index == value,
+                //             onTap: () {
+                //               item.onTap(currentDateNotifier);
+                //               selectedQuickButton.value = index;
+                //               if (currentDateNotifier.value != null) {
+                //                 currentPageNotifier.value =
+                //                     currentDateNotifier.value!;
+                //               }
+                //             },
+                //           ),
+                //         ),
+                //       );
+                //     },
+                //   ),
+                // ),
+                // GridView.count(
+                //   crossAxisCount: 2,
+                //   childAspectRatio:size.width>800?20: size.width>400?8: 4,
+                //   mainAxisSpacing: 16,
+                //   crossAxisSpacing: 16,
+                //   shrinkWrap: true,
+                //   children: List.generate(
+                //     widget.quickButtonList.length,
+                //     (index) {
+                //       final item = widget.quickButtonList[index];
+                //       return SizedBox(height: max(50, 0),
+                //         child: ValueListenableBuilder<int>(
+                //           valueListenable: selectedQuickButton,
+                //           builder: (context, value, child) => AppButton(
+                //             text: item.text,
+                //             isPrimary: index == value,
+                //             onTap: () {
+                //               item.onTap(currentDateNotifier);
+                //               selectedQuickButton.value = index;
+                //               if (currentDateNotifier.value != null) {
+                //                 currentPageNotifier.value =
+                //                     currentDateNotifier.value!;
+                //               }
+                //             },
+                //           ),
+                //         ),
+                //       );
+                //     },
+                //   ),
+                // ),
+                GridView.extent(
+                  maxCrossAxisExtent: 400/2,
+                  childAspectRatio: min(4,size.width*0.1),
+                  // childAspectRatio:size.width>800?20: size.width>400?8: 4,
+                  mainAxisSpacing: 16,
+                  crossAxisSpacing: 16,
+                  shrinkWrap: true,
+                  children: List.generate(
+                    widget.quickButtonList.length,
+                    (index) {
+                      final item = widget.quickButtonList[index];
+                      return SizedBox(height: max(50, 0),
+                        child: ValueListenableBuilder<int>(
+                          valueListenable: selectedQuickButton,
+                          builder: (context, value, child) => AppButton(
+                            text: item.text,
+                            isPrimary: index == value,
+                            onTap: () {
+                              item.onTap(currentDateNotifier);
+                              selectedQuickButton.value = index;
+                              if (currentDateNotifier.value != null) {
+                                currentPageNotifier.value =
+                                    currentDateNotifier.value!;
+                              }
+                            },
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                ),
+                ValueListenableBuilder<DateTime>(
+                  valueListenable: currentPageNotifier,
+                  builder: (context, currentPage, child) {
+                    bool disablePrevious =
+                        currentPage.month == widget.firstDate.month &&
+                            currentPage.year == widget.firstDate.year;
+                    bool disableNext =
+                        currentPage.month == widget.lastDate.month &&
+                            currentPage.year == widget.lastDate.year;
+                    return Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        spacing: 16,
+                        children: [
+                          const Spacer(),
+                          GestureDetector(
+                              onTap: disablePrevious ? null : previousPage,
+                              child: const Icon(Icons.arrow_left)),
+                          Expanded(
+                            flex: 5,
+                            child: Text(
+                              DateFormat('MMMM yyyy').format(currentPage),
+                              textAlign: TextAlign.center,
+                              style: const TextStyle(
+                                  fontWeight: FontWeight.w500, fontSize: 16),
+                            ),
+                          ),
+                          IconButton(
+                            onPressed: disableNext ? null : nextPage,
+                            icon: Icon(Icons.arrow_right),
+                          ),
+                          const Spacer(),
+                        ],
                       ),
                     );
                   },
                 ),
-              ),
-              ValueListenableBuilder<DateTime>(
-                valueListenable: currentPageNotifier,
-                builder: (context, currentPage, child) {
-                  bool disablePrevious =
-                      currentPage.month == widget.firstDate.month &&
-                          currentPage.year == widget.firstDate.year;
-                  bool disableNext =
-                      currentPage.month == widget.lastDate.month &&
-                          currentPage.year == widget.lastDate.year;
-                  return Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      spacing: 16,
-                      children: [
-                        const Spacer(),
-                        GestureDetector(
-                            onTap: disablePrevious ? null : previousPage,
-                            child: const Icon(Icons.arrow_left)),
-                        Expanded(
-                          flex: 5,
-                          child: Text(
-                            DateFormat('MMMM yyyy').format(currentPage),
-                            textAlign: TextAlign.center,
-                            style: const TextStyle(
-                                fontWeight: FontWeight.w500, fontSize: 16),
-                          ),
+                const SizedBox(
+                  height: 8,
+                ),
+                SizedBox(
+                  height: 250,
+                  child: myDatePicker(),
+                ),
+                Row(
+                  children: [
+                    Expanded(
+                      child: Align(
+                        alignment: Alignment.centerLeft,
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          spacing: 8,
+                          children: [
+                            SvgPicture.asset(AppIcons.calendar),
+                            Text(
+                              currentDate == null
+                                  ? 'No date'
+                                  : AppDateUtils.formatDate(currentDate),
+                              textAlign: TextAlign.left,
+                            ),
+                          ],
                         ),
-                        IconButton(
-                          onPressed: disableNext ? null : nextPage,
-                          icon: Icon(Icons.arrow_right),
-                        ),
-                        const Spacer(),
-                      ],
-                    ),
-                  );
-                },
-              ),
-              const SizedBox(
-                height: 8,
-              ),
-              SizedBox(
-                height: 250,
-                child: myDatePicker(),
-              ),
-              Row(
-                children: [
-                  Expanded(
-                    child: Align(
-                      alignment: Alignment.centerLeft,
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        spacing: 8,
-                        children: [
-                          SvgPicture.asset(AppIcons.calendar),
-                          Text(
-                            currentDate == null
-                                ? 'No date'
-                                : AppDateUtils.formatDate(currentDate),
-                            textAlign: TextAlign.left,
-                          ),
-                        ],
                       ),
                     ),
-                  ),
-                  SaveCancelRow(
-                    onSave: () => Navigator.pop(context, currentDate),
-                    onCancel: () => Navigator.pop(context),
-                  )
-                ],
-              ),
-            ],
+                    SaveCancelRow(
+                      onSave: () => Navigator.pop(context, currentDate),
+                      onCancel: () => Navigator.pop(context),
+                    )
+                  ],
+                ),
+              ],
+            ),
           ),
         ),
       ),
@@ -174,12 +241,12 @@ class _MyDatePickerState extends State<MyDatePicker> {
   }
 
   void nextPage() async {
-    if(!mounted) return;
+    if (!mounted) return;
     await controller.nextPage(duration: Durations.medium1, curve: Curves.ease);
   }
 
   void previousPage() async {
-     if(!mounted) return;
+    if (!mounted) return;
     await controller.previousPage(
         duration: Durations.medium1, curve: Curves.ease);
   }

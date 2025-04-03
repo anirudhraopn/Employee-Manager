@@ -17,10 +17,24 @@ class EditEmployee extends HomeEvents {
   EditEmployee(this.key, {required this.employee});
 }
 
-class DeleteEmployee extends HomeEvents {
+class HardDeleteEmployee extends HomeEvents {
   final dynamic key;
 
-  DeleteEmployee(
+  HardDeleteEmployee(
     this.key,
   );
 }
+
+class SoftDeleteEmployee extends HomeEvents {
+  final dynamic key;
+
+  SoftDeleteEmployee({required this.key});
+}
+
+class UndoDelete extends HomeEvents {
+  final dynamic key;
+
+  UndoDelete({required this.key});
+}
+
+class AutoDeleteDeletedEmployees extends HomeEvents{}

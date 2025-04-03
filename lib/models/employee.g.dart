@@ -21,13 +21,14 @@ class EmployeeAdapter extends TypeAdapter<Employee> {
       role: fields[1] as String,
       startDate: fields[2] as DateTime,
       endDate: fields[3] as DateTime?,
+      isDeleted: fields[4] as bool,
     );
   }
 
   @override
   void write(BinaryWriter writer, Employee obj) {
     writer
-      ..writeByte(4)
+      ..writeByte(5)
       ..writeByte(0)
       ..write(obj.name)
       ..writeByte(1)
@@ -35,7 +36,9 @@ class EmployeeAdapter extends TypeAdapter<Employee> {
       ..writeByte(2)
       ..write(obj.startDate)
       ..writeByte(3)
-      ..write(obj.endDate);
+      ..write(obj.endDate)
+      ..writeByte(4)
+      ..write(obj.isDeleted);
   }
 
   @override

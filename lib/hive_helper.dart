@@ -31,9 +31,10 @@ class HiveHelper {
     }
     // await employeeBox.deleteAt(index);
     await employeeBox.putAt(max(index, 0), employee);
+    await employeeBox.flush();
   }
 
-static Future<void> deleteEmployee(dynamic key) async {
+  static Future<void> deleteEmployee(dynamic key) async {
     final index = employeeBox.values.toList().indexWhere(
       (element) {
         return key == element.key;
@@ -44,5 +45,24 @@ static Future<void> deleteEmployee(dynamic key) async {
     }
     // await employeeBox.deleteAt(index);
     await employeeBox.deleteAt(max(index, 0));
+  }
+
+  static int? getEmployeeIndex(dynamic key) {
+    final index = employeeBox.values.toList().indexWhere(
+      (element) {
+        return key == element.key;
+      },
+    );
+    if (index == -1) {
+      return null;
+    }
+    // await employeeBox.deleteAt(index);
+    return index;
+  }
+
+  static Future<void> deleteEmployees(List<Employee> employees) async {
+    await employeeBox.deleteAll(employees.map(
+      (e) => e.key,
+    ));
   }
 }
