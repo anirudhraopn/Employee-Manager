@@ -1,0 +1,2 @@
+C:/Users/aniru/employee_manager/android/app/.cxx/RelWithDebInfo/j2e48191/arm64-v8a/CMakeFiles/edit_cache.dir
+C:/Users/aniru/employee_manager/android/app/.cxx/RelWithDebInfo/j2e48191/arm64-v8a/CMakeFiles/rebuild_cache.dir
