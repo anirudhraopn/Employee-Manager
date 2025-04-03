@@ -34,7 +34,7 @@ class _HomeScreenState extends State<HomeScreen> {
         if (state is SoftDeletedSuccessfully) {
           final controller = ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text('Employee data has been deleted'),
+              content: const Text('Employee data has been deleted'),
               action: SnackBarAction(
                 onPressed: () {
                   context

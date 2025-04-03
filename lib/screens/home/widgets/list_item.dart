@@ -57,7 +57,7 @@ class ListItem extends StatelessWidget {
               ),
               Text(
                 employee.role.isEmpty ? '' : employee.role,
-                style: TextStyle(
+                style: const TextStyle(
                   color: AppColors.textGrey,
                 ),
               ),
@@ -66,7 +66,7 @@ class ListItem extends StatelessWidget {
                   employee.startDate,
                   endDate: employee.endDate,
                 ),
-                style: TextStyle(
+                style: const TextStyle(
                   color: AppColors.textGrey,
                 ),
               ),

@@ -1,7 +1,6 @@
 import 'package:employee_manager/constants/app_colors.dart';
 import 'package:employee_manager/constants/app_text_styles.dart';
 import 'package:employee_manager/models/employee.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import 'list_item.dart';

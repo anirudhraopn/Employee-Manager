@@ -45,7 +45,7 @@ class MyApp extends StatelessWidget {
             enabledBorder: AppTextField.border,
             focusedBorder: AppTextField.border,
             prefixIconColor: AppColors.primaryColor,
-            hintStyle: TextStyle(color: Colors.grey),
+            hintStyle: const TextStyle(color: Colors.grey),
           ),
           useMaterial3: true,
         ),

@@ -15,7 +15,8 @@ class HomeBloc extends Bloc<HomeEvents, HomeState> {
 
   void registerHandler(HomeEvents event, Emitter<HomeState> emit) async {
     log(event.toString());
-    if (event.runtimeType != AutoDeleteDeletedEmployees) {
+    if (![AutoDeleteDeletedEmployees, HardDeleteEmployee]
+        .contains(event.runtimeType)) {
       emit(LoadingData());
     }
     try {
@@ -91,7 +92,6 @@ class HomeBloc extends Bloc<HomeEvents, HomeState> {
       employee = HiveHelper.employeeBox.values.toList()[employeeIndex];
     }
     await HiveHelper.deleteEmployee(event.key);
-    _fetchEmployees(emit);
     emit(HardDeletedEmployee(employee: employee!));
   }
 

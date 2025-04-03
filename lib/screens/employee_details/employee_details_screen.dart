@@ -278,7 +278,7 @@ class _EmployeeDetailsScreenState extends State<EmployeeDetailsScreen> {
     final employee = Employee(
       name: nameController.text,
       role: selectedRoleController.text,
-      startDate: startDate!,
+      startDate: startDate,
       endDate: endDate,
     );
     context.read<HomeBloc>().add(isEditing
