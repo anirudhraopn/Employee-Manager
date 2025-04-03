@@ -53,6 +53,8 @@ class _MyDatePickerState extends State<MyDatePicker> {
     currentPageNotifier = ValueNotifier(widget.initialDate ?? DateTime.now());
   }
 
+  bool isNoDate = false;
+
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
@@ -89,7 +91,8 @@ class _MyDatePickerState extends State<MyDatePicker> {
                               text: item.text,
                               isPrimary: index == value,
                               onTap: () {
-                                item.onTap(currentDateNotifier);
+                                final res = item.onTap(currentDateNotifier);
+                                isNoDate = res == '';
                                 selectedQuickButton.value = index;
                                 if (currentDateNotifier.value != null) {
                                   currentPageNotifier.value =
@@ -168,7 +171,8 @@ class _MyDatePickerState extends State<MyDatePicker> {
                         ),
                       ),
                       SaveCancelRow(
-                        onSave: () => Navigator.pop(context, currentDate),
+                        onSave: () =>
+                            Navigator.pop(context, [currentDate, isNoDate]),
                         onCancel: () => Navigator.pop(context),
                       )
                     ],
@@ -205,6 +209,7 @@ class _MyDatePickerState extends State<MyDatePicker> {
       onValueChanged: (value) {
         selectedQuickButton.value = -1;
         currentDateNotifier.value = value.first;
+        isNoDate = false;
         // currentPageNotifier.value = value.first;
       },
       config: CalendarDatePicker2Config(
@@ -243,7 +248,7 @@ class _MyDatePickerState extends State<MyDatePicker> {
 
 class QuickButton {
   final String text;
-  final ValueChanged<ValueNotifier<DateTime?>> onTap;
+  final String? Function(ValueNotifier<DateTime?> currentDate) onTap;
 
   QuickButton({
     required this.text,

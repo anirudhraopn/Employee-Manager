@@ -74,6 +74,7 @@ class _EmployeeDetailsScreenState extends State<EmployeeDetailsScreen> {
       text: 'No date',
       onTap: (currentDate) {
         currentDate.value = null;
+        return '';
       },
     ),
     QuickButton(
@@ -202,17 +203,17 @@ class _EmployeeDetailsScreenState extends State<EmployeeDetailsScreen> {
                               prefixIcon: AppIcons.calendar,
                               onTap: () async {
                                 final now = DateTime.now();
-                                startDate = await showCustomDatePicker(
-                                        context: context,
-                                        firstDate: DateTime(
-                                            now.year - 50, now.month, now.day),
-                                        lastDate: DateTime(
-                                            now.year, now.month + 2, now.day),
-                                        initialDate:
-                                            widget.employee?.startDate ?? now,
-                                        quickButtonList:
-                                            startDateQuickOptions) ??
-                                    now;
+                                final res = await showCustomDatePicker(
+                                    context: context,
+                                    firstDate: DateTime(
+                                        now.year - 50, now.month, now.day),
+                                    lastDate: DateTime(
+                                        now.year, now.month + 2, now.day),
+                                    initialDate:
+                                        widget.employee?.startDate ?? now,
+                                    quickButtonList: startDateQuickOptions);
+
+                                startDate = res?.firstOrNull ?? now;
                                 startDateController.text =
                                     AppDateUtils.getFormatedDateForList(
                                         startDate);
@@ -232,7 +233,7 @@ class _EmployeeDetailsScreenState extends State<EmployeeDetailsScreen> {
                               style: AppTextStyles.bodySmall,
                               onTap: () async {
                                 final now = DateTime.now();
-                                endDate = await showCustomDatePicker(
+                                final result = await showCustomDatePicker(
                                   context: context,
                                   firstDate: DateTime(
                                       now.year - 50, now.month, now.day),
@@ -240,10 +241,15 @@ class _EmployeeDetailsScreenState extends State<EmployeeDetailsScreen> {
                                   initialDate: widget.employee?.endDate ?? now,
                                   quickButtonList: endDateQuickOptions,
                                 );
+                                final isNull = (result?.lastOrNull is bool &&
+                                    result?.lastOrNull == true);
+                                    endDate = result?.firstOrNull;
                                 if (endDate != null) {
                                   endDateController.text =
                                       AppDateUtils.getFormatedDateForList(
                                           endDate!);
+                                }else if(isNull){
+                                  endDateController.text = 'No date';
                                 }
                               },
                             ),
@@ -288,14 +294,14 @@ class _EmployeeDetailsScreenState extends State<EmployeeDetailsScreen> {
   }
 }
 
-Future<DateTime?> showCustomDatePicker({
+Future<List?> showCustomDatePicker({
   required BuildContext context,
   required DateTime initialDate,
   required DateTime firstDate,
   required DateTime lastDate,
   List<QuickButton> quickButtonList = const [],
 }) async {
-  final result = await showDialog(
+  final res = await showDialog(
     context: context,
     builder: (context) {
       return MyDatePicker(
@@ -305,5 +311,5 @@ Future<DateTime?> showCustomDatePicker({
           quickButtonList: quickButtonList);
     },
   );
-  return result;
+  return res == null ? null : (res as List);
 }
